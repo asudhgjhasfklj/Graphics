@@ -1,0 +1,64 @@
+let cols, rows;
+let scl = 40;
+let w = 1400;
+let h = 1000;
+
+let flying = 0;
+
+let terrain = [];
+
+function setup() {
+  createCanvas(600, 600, WEBGL);
+  cols = w / scl;
+  rows = h / scl;
+
+  for (let x = 0; x < cols; x++) {
+    terrain[x] = [];
+    for (let y = 0; y < rows; y++) {
+      terrain[x][y] = 0; //specify a default value for now
+    }
+  }
+   noStroke();
+}
+
+function draw() {
+  flying -= 0.01;
+  let yoff = flying;
+  for (let y = 0; y < rows; y++) {
+    var xoff = 0;
+    for (let x = 0; x < cols; x++) {
+      terrain[x][y] = map(noise(xoff, yoff), 0, 1, -100, 100);
+      xoff += 0.2;
+    }
+    yoff += 0.2;
+  }
+  background(173, 207, 255);
+  rotateX(PI / 3);
+  fill(164, 164, 164, 196);
+  translate(-w / 2, -h / 2);
+  for (let y = 0; y < rows - 1; y++) {
+    beginShape(TRIANGLE_STRIP);
+    for (let x = 0; x < cols; x++) {
+      let v = terrain[x][y];
+      fill(0, v+50, v+150, v+200);
+      vertex(x * scl, y * scl, terrain[x][y]);
+      vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
+      }
+      endShape();
+  }
+  push();
+  ambientLight(255);
+  ambientMaterial(255);
+  translate(400, 230, 180);
+  sphere(40);
+  pop();
+  
+  push();
+  let locX = mouseX - width / 2;
+  let locY = mouseY - height / 2;
+  pointLight(255, 255, 255, locX, locY, 255);
+  ambientMaterial(255, 0, 0);
+  translate(700, 750, 30);
+  torus(40, 20);
+  pop();
+}
